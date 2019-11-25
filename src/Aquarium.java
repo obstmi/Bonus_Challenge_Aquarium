@@ -1,87 +1,80 @@
-
 public class Aquarium {
 
-	int numOfFishes;
-	int width;
-	Fish[] fishes;
-	char[][] pool;
+	private int numOfFishes;
+	private int width;
+	private Fish[] fishes;
+	private Lane[] lanes; 
 
 	//Test-Konstruktor mit 4 Fischen im 42er Aquarium:
 	public Aquarium() {
 		super();
 		this.numOfFishes = 4;
 		this.width = 42;
-		this.fishes = new Fish[4];
-		this.pool = new char[this.getNumOfFishes()+1][this.getWidth()];
+		this.fishes = new Fish[this.getNumOfFishes()];
+		this.lanes = new Lane[this.getNumOfFishes()+1];
+		
 		fishes[0] = new Fish(5, true); //ToDo: initiale Zufallsposition
 		fishes[1] = new Fish(25, false);
 		fishes[2] = new Fish(10, false);
 		fishes[3] = new Fish(35, true);
-
-		initializeAquarium();
+		
+		lanes[0] = new Lane(this.getWidth(), null); //Aquariumboden
+		lanes[1] = new Lane(this.getWidth(), getFishes()[0]);
+		lanes[2] = new Lane(this.getWidth(), getFishes()[1]);
+		lanes[3] = new Lane(this.getWidth(), getFishes()[2]);
+		lanes[4] = new Lane(this.getWidth(), getFishes()[3]);
 	}
 	
-	
+
 	public Aquarium(int numOfFishes, int width) {
 		super();
 		this.numOfFishes = numOfFishes;
 		this.width = width;
-		this.fishes = new Fish[4];
-		this.pool = new char[this.getNumOfFishes()+1][this.getWidth()];
-		
+		this.fishes = new Fish[numOfFishes];
+		this.lanes = new Lane[numOfFishes+1];
+		initializeAquarium();
 	}
+
+	
+
+	private void initializeAquarium(){
+		// erzeuge Fische
+		for (int i = 0; i < fishes.length; i++) {
+			fishes[i] = new Fish(getRandomPosition(getWidth()), getRandomDirection());
+		}
+		// erzeuge Schwimmbahnen
+		lanes[0] = new Lane(getWidth(), null);
+		for (int i = 1; i < getLanes().length; i++) {
+			lanes[i] = new Lane(getWidth(), getFishes()[i-1]);
+		}
+	}
+	
+	private int getRandomPosition(int width) {
+		return (int)((Math.random()) * (width-4) + 1);
+	}
+	
+	private boolean getRandomDirection() {
+		return Math.random() < 0.5;
+	}
+
 	
 	public void showAquarium() {
 		for (int i = this.getNumOfFishes(); i >=0; i--) {
-			System.out.println("Zeile "+i+ " :"+ String.valueOf(pool[i]));
+			System.out.println(getLanes()[i].printThisLane());
 		}
 	}
 	
-	public void letTheFishesSwim(int steps) {
+	public void letTheFishesSwim(int steps) throws InterruptedException {
 		for (int i = 0; i < steps; i++) {
 			this.showAquarium();
-			// this.fishMove();
-			// wait..
+			for (int j = 1; j < lanes.length; j++) {
+				lanes[j].moveFish();
+			}
+			Thread.sleep(120);
 		}
 	}
 	
-	
-	private char[] generateLane(Fish myFish){
-		char[] line = new char[this.getWidth()];
-		int fishPosition = myFish.getPosition();
-		
-		line[0]='|';
-		
-		for (int i = 1; i < fishPosition; i++) {
-			line[i]=' ';
-		}
-		
-		if (myFish.getDirection()) { //true = Richtung nach rechts
-			line[fishPosition]='>'; //Position des Fisches
-			line[fishPosition+1]='<';
-			line[fishPosition+2]='>';
-		} else {
-			line[fishPosition]='<'; //Position des Fisches
-			line[fishPosition+1]='>';
-			line[fishPosition+2]='<';
-		}
-		
-		for (int i = fishPosition+3; i < this.getWidth()-1; i++) { //Position des Fisches
-			line[i]=' ';
-		}
-		
-		line[this.getWidth()-1] = '|';
-		
-		return line;
-		
-	}
-	
-	private void initializeAquarium(){
-		this.pool[0]="+----------------------------------------+".toCharArray();
-		for (int i = 0; i < getFishes().length; i++) {
-			this.pool[i+1] = generateLane(getFishes()[i]);
-		}
-	}
+
 
 	public int getNumOfFishes() {
 		return numOfFishes;
@@ -105,6 +98,14 @@ public class Aquarium {
 
 	public void setFishes(Fish[] fishes) {
 		this.fishes = fishes;
+	}
+	
+	public Lane[] getLanes() {
+		return lanes;
+	}
+
+	public void setLanes(Lane[] lanes) {
+		this.lanes = lanes;
 	}
 	
 	
