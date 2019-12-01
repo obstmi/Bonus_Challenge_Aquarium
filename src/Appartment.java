@@ -6,7 +6,7 @@ public class Appartment {
 		Aquarium meinAquarium = new Aquarium(52,200);
 		//Aquarium meinAquarium = new Aquarium(6,160);
 		//meinAquarium.showAquarium();
-		meinAquarium.letTheFishesSwim(2000);
+		meinAquarium.letTheFishesSwim(20000);
 
 	}
 
